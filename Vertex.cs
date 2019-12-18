@@ -74,23 +74,5 @@ namespace Graph
         {
             numberOfVertex_ = newNumber;
         }
-
-
-        public void setQueen()
-        {
-            for (int i = 0; i < adjacencyList_.Count; i++) {
-                if (adjacencyList_[i] == 1)
-                    adjacencyList_[i] = 2;
-            }
-        }
-
-
-        public void clearQueenPresence()
-        {
-            for (int i = 0; i < adjacencyList_.Count; i++) {
-                if (adjacencyList_[i] == 2)
-                    adjacencyList_[i] = 1;
-            }
-        }
     }
 }

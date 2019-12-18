@@ -53,7 +53,6 @@ namespace Graph
                 
             }
 
-            int conter = 3;
             while (true) {
                 for (int i = 0; i < mainArray_.Count; i++)
                 {
@@ -89,8 +88,6 @@ namespace Graph
                     for (int i = queenNumbers.Count; i < 8; i++) {
                         removedQueens[i].Clear();
                     }
-
-                    conter++;
                 } else {
                     break;
                 }
@@ -99,10 +96,6 @@ namespace Graph
             return  queenNumbers;
         }
 
-
-        //int whenEntered = queenNumbers.Count;
-        //if (!removedQueens.Contains(tempOne.getNumber() - 1))
-        //tryQueen (tempOne );
 
         private bool tryQueen(Vertex whereToTryVertex)
         {
@@ -130,108 +123,6 @@ namespace Graph
 
 
         public Vertex this [int index] => mainArray_[index];
-
-
-        public void buildGraphFirst()
-        {
-            int[,] futherGraph = new int[8, 8];
-
-            Random rand = new Random();
-            int i = 1;
-            int prevI = -1;
-            bool isSwitched = false;
-            for (int row = 0; row < 8; row++) {
-                while (true) {
-                    if (Math.Abs(i) >= 8)
-                    {
-                        i = Math.Abs (i) % 8;
-                        isSwitched = true;
-                    }
-
-                    if (isSwitched == false && i <= prevI) {
-                        i++;
-                    }
-
-                    if (futherGraph[row, i] == 0)
-                    {
-                        for (int j = 0; j < 8; j++)
-                        {
-                            futherGraph[row, j] = 1;
-                            futherGraph[j, i] = 1;
-
-                            if (row + j < 8)
-                            {
-                                if (i + j < 8)
-                                    futherGraph[row + j, i + j] = 1;
-                                if (i - j >= 0)
-                                    futherGraph[row + j, i - j] = 1;
-                            }
-
-                            if (row - j >= 0)
-                            {
-                                if (i + j < 8)
-                                    futherGraph[row - j, i + j] = 1;
-                                if (i - j >= 0)
-                                    futherGraph[row - j, i - j] = 1;
-                            }
-                        }
-
-                        futherGraph[row, i] = 2;
-                        prevI = i;
-                        //isSwitched = false;
-                        if (isSwitched == true)
-                            i--;
-                        else
-                            i++;
-
-                        break;
-                    }
-
-                    if (isSwitched == true)
-                        i--;
-                    else
-                        i++;
-                }
-            }
-        }
-
-
-        public void buildGraph()
-        {
-            int[,] futherGraph = new int[8, 8];
-            //int row = 0;
-            for (int row = 0; row < 8; row++) {
-                for (int i = 0; i < 8; i++)
-                {
-                    if (futherGraph[row, i] == 0)
-                    {
-                        for (int j = 0; j < 8; j++)
-                        {
-                            futherGraph[row, j] = 1;
-                            futherGraph[j, i] = 1;
-
-                            if (row + j < 8)
-                            {
-                                if (i + j < 8)
-                                    futherGraph[row + j, i + j] = 1;
-                                if (i - j >= 0)
-                                    futherGraph[row + j, i - j] = 1;
-                            }
-
-                            if (row - j >= 0)
-                            {
-                                if (i + j < 8)
-                                    futherGraph[row - j, i + j] = 1;
-                                if (i - j >= 0)
-                                    futherGraph[row - j, i - j] = 1;
-                            }
-                        }
-
-                        futherGraph[row, i] = 2;
-                    }
-                } 
-            }
-        }
 
 
         public void buildGraph (string fileName)

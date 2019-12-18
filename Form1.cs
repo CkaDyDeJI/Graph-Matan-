@@ -31,6 +31,7 @@ namespace Graph
 
         private Graphics anotherOne_;
         private Bitmap anotherBitmap_;
+        private Image mainImage_ = Image.FromFile ( "crown_PNG23872.png" );
 
 
         public Form1()
@@ -54,6 +55,9 @@ namespace Graph
             openFileDialog1.ShowDialog();
             fileName = openFileDialog1.FileName;
             mainGraph.buildGraph (fileName);
+
+            button10.Enabled = true;
+            button9.Enabled = true;
         }
 
 
@@ -75,7 +79,7 @@ namespace Graph
 
             mainFont = new Font ("Arial", vertexRadious / 2);
             var varForAngle = 0;
-            var circleRadious = 200;
+            var circleRadious = 500;
             var centerX = pictureBox1.Width / 2;
             var centerY = pictureBox1.Height / 2;
             int topLeftX;
@@ -359,24 +363,26 @@ namespace Graph
 
         private void button10_Click (object sender, EventArgs e)
         {
-            //tableLayoutPanel1.row
-            //dataGridView1.RowCount = 8;
-            Image mainImage = Image.FromFile ( "crown_PNG23872.png" );
+            int startForm = Convert.ToInt32(Interaction.InputBox ("enter start position (0 - 63)"));
 
-            List<int> tempOne = mainGraph.bfs ();
-            //string[,] forOutput = new string[8, 8];
-            for (int i = 0; i < 8; i++)
-            {
-                
-                anotherOne_.DrawImage ( mainImage, 100 * (tempOne[i] / 8), 100 * (tempOne[i] % 8));
-                //dataGridView1.Rows[tempOne[i] / 8].Cells[tempOne[i] % 8].Value = "Q\t";
+            anotherOne_.Clear ( Color.Transparent );
 
-                //for (int j = 0; j < 8; j++)
-                //{
-                //    if ((string)dataGridView1.Rows[i].Cells[j].Value != "Q\t")
-                //        dataGridView1.Rows[i].Cells[j].Value = ".\t";
-                //}
-            }
+            List<int> tempOne = mainGraph.bfs (8, startForm);
+            for (int i = 0; i < tempOne.Count; i++)
+                anotherOne_.DrawImage ( mainImage_, 100 * (tempOne[i] % 8), 100 * (tempOne[i] / 8));
+
+            pictureBox2.Image = anotherBitmap_;
+        }
+
+        private void button9_Click (object sender, EventArgs e)
+        {
+            int startForm = Convert.ToInt32 ( Interaction.InputBox ("enter start position (0 - 63)"));
+
+            anotherOne_.Clear (Color.Transparent);
+
+            List <int> tempOne = mainGraph.bfs (5, startForm);
+            for (int i = 0; i < tempOne.Count; i++)
+                anotherOne_.DrawImage ( mainImage_, 100 * (tempOne[i] % 8), 100 * (tempOne[i] / 8));
 
             pictureBox2.Image = anotherBitmap_;
         }

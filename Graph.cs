@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 
@@ -9,9 +10,8 @@ namespace Graph
     internal class Graph
     {
         private int count_;
-        //private int queenCount_ = 0;
+        private int[,] futherGraph_ = new int[8, 8];
         private List <int> queenNumbers = new List <int>();
-
         private List <List <int>> removedQueens = new List <List <int>>
         {
             new List <int>(), new List <int>(), new List <int>(), new List <int>(), 
@@ -29,54 +29,47 @@ namespace Graph
         }
 
 
-        public List <int> bfs()
+        public List <int> bfs(int minOrMax, int startFrom)
         {
-            Queue <Vertex> mainQueue = new Queue <Vertex>();
-            mainQueue.Enqueue(mainArray_[0]);
-            queenNumbers.Add (mainQueue.Peek().getNumber() - 1);
-            //mainArray_[0].setQueen();
+            queenNumbers.Clear ();
 
-            
-            while (mainQueue.Count != 0)
-            {
-                Vertex tempOne = mainQueue.Dequeue ();
-                tempOne.IsVisited = true;
-                for (int i = 0; i < tempOne.getList ().Count; i++)
-                {
-                    if (tempOne.getList()[i] != 0 && mainArray_[i].IsVisited == false) {
-                        mainQueue.Enqueue ( mainArray_[i] );
-                        mainArray_[i].IsVisited = true;
-                    }
-                }
-
-                tryQueen ( tempOne );
-                
-            }
+            Queue<Vertex> mainQueue = new Queue<Vertex> ();
+            mainQueue.Enqueue ( mainArray_[startFrom] );
+            tryQueen( mainArray_[mainQueue.Peek ().getNumber () - 1]);
 
             while (true) {
+                for (int i = 0; i < queenNumbers.Count; i++)
+                    buildGraph ( queenNumbers[i] );
+
                 for (int i = 0; i < mainArray_.Count; i++)
                 {
-                    if (!queenNumbers.Contains (i))
+                    if (!queenNumbers.Contains ( i ))
                         mainArray_[i].IsVisited = false;
                 }
 
-                if (queenNumbers.Count != 8) {
-                    mainQueue.Enqueue ( mainArray_[queenNumbers.Last ()] );
-                    removedQueens[queenNumbers.Count - 1].Add ( queenNumbers.Last ());
-                    queenNumbers.RemoveAt ( queenNumbers.Count - 1 );
-                        
-                    while (mainQueue.Count != 0) {
+                if (queenNumbers.Count != minOrMax || checkFullnes() == false) {
+                    if (queenNumbers.Count > 1)
+                    {
+                        mainQueue.Enqueue ( mainArray_[queenNumbers.Last ()] );
+                        removedQueens[queenNumbers.Count - 1].Add ( queenNumbers.Last () );
+                        queenNumbers.RemoveAt ( queenNumbers.Count - 1 );
+                    }
+
+                    while (mainQueue.Count != 0)
+                    {
                         Vertex tempOne = mainQueue.Dequeue ();
                         tempOne.IsVisited = true;
                         for (int i = 0; i < tempOne.getList ().Count; i++)
                         {
-                            if (tempOne.getList()[i] != 0 && mainArray_[i].IsVisited == false) {
+                            if (tempOne.getList ()[i] != 0 && mainArray_[i].IsVisited == false)
+                            {
                                 mainQueue.Enqueue ( mainArray_[i] );
                                 mainArray_[i].IsVisited = true;
-                            } 
+                            }
                         }
 
-                        for (int i = 0; i < 8; i++) {
+                        for (int i = 0; i < 8; i++)
+                        {
                             if (removedQueens[i].Contains ( tempOne.getNumber () - 1 ))
                                 break;
 
@@ -85,15 +78,161 @@ namespace Graph
                         }
                     }
 
-                    for (int i = queenNumbers.Count; i < 8; i++) {
-                        removedQueens[i].Clear();
+                    for (int i = queenNumbers.Count; i < 8; i++)
+                    {
+                        removedQueens[i].Clear ();
                     }
-                } else {
+
+                    clearMatrix();
+                } else
                     break;
+            }
+
+            clearMatrix ();
+            clearRemovedQueens();
+            clearAllVisited ();
+            return queenNumbers;
+        }
+
+
+        private void clearRemovedQueens()
+        {
+            for (int i = 0; i < removedQueens.Count; i++)
+            {
+                removedQueens[i].Clear();
+            }
+        }
+
+
+        private bool checkFullnes()
+        {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (futherGraph_[i, j] == 0)
+                        return false;
                 }
             }
 
-            return  queenNumbers;
+            return true;
+        }
+
+
+        private void clearMatrix()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++) {
+                    futherGraph_[i, j] = 0;
+                }
+            }
+        }
+
+
+        private void buildGraph (int numberOfVertex)
+        {
+            for (int i = 0; i < 8; i++) {
+                futherGraph_[i, numberOfVertex % 8] = 1;
+            }
+
+            for (int i = 0; i < 8; i++) {
+                futherGraph_[numberOfVertex / 8, i] = 1;
+            }
+
+            int row = numberOfVertex / 8;
+            int column = numberOfVertex % 8;
+            while (row >= 0 && column >= 0) {
+                futherGraph_[row, column] = 1;
+                row--;
+                column--;
+            }
+
+            row = numberOfVertex / 8;
+            column = numberOfVertex % 8;
+            while (row <= 7 && column >= 0)
+            {
+                futherGraph_[row, column] = 1;
+                row++;
+                column--;
+            }
+
+            row = numberOfVertex / 8;
+            column = numberOfVertex % 8;
+            while (row <= 7 && column <= 7)
+            {
+                futherGraph_[row, column] = 1;
+                row++;
+                column++;
+            }
+
+            row = numberOfVertex / 8;
+            column = numberOfVertex % 8;
+            while (row >= 0 && column <= 7)
+            {
+                futherGraph_[row, column] = 1;
+                row--;
+                column++;
+            }
+        }
+        //public List <int> bfs()
+        //{
+        //    queenNumbers.Clear();
+
+        //    Queue <Vertex> mainQueue = new Queue <Vertex>();
+        //    mainQueue.Enqueue(mainArray_[0]);
+        //    queenNumbers.Add (mainQueue.Peek().getNumber() - 1);
+
+        //    while (true) {
+        //        for (int i = 0; i < mainArray_.Count; i++)
+        //        {
+        //            if (!queenNumbers.Contains (i))
+        //                mainArray_[i].IsVisited = false;
+        //        }
+
+        //        if (queenNumbers.Count != 8) {
+        //            if (queenNumbers.Count > 1)
+        //            {
+        //                mainQueue.Enqueue ( mainArray_[queenNumbers.Last ()] );
+        //                removedQueens[queenNumbers.Count - 1].Add ( queenNumbers.Last () );
+        //                queenNumbers.RemoveAt ( queenNumbers.Count - 1 );
+        //            }
+
+        //            while (mainQueue.Count != 0) {
+        //                Vertex tempOne = mainQueue.Dequeue ();
+        //                tempOne.IsVisited = true;
+        //                for (int i = 0; i < tempOne.getList ().Count; i++)
+        //                {
+        //                    if (tempOne.getList()[i] != 0 && mainArray_[i].IsVisited == false) {
+        //                        mainQueue.Enqueue ( mainArray_[i] );
+        //                        mainArray_[i].IsVisited = true;
+        //                    } 
+        //                }
+
+        //                for (int i = 0; i < 8; i++) {
+        //                    if (removedQueens[i].Contains ( tempOne.getNumber () - 1 ))
+        //                        break;
+
+        //                    if (i == 7)
+        //                        tryQueen ( tempOne );
+        //                }
+        //            }
+
+        //            for (int i = queenNumbers.Count; i < 8; i++) {
+        //                removedQueens[i].Clear();
+        //            }
+        //        } else
+        //            break;
+        //    }
+
+        //    clearAllVisited();
+        //    return  queenNumbers;
+        //}
+
+
+        private void clearAllVisited()
+        {
+            for (int i = 0; i < count_; i++) {
+                mainArray_[i].IsVisited = false;
+            }
         }
 
 
@@ -102,6 +241,7 @@ namespace Graph
             if (hasNeighbor (whereToTryVertex) == false) {
                 //whereToTryVertex.setQueen ();
                 queenNumbers.Add (whereToTryVertex.getNumber() - 1);
+                buildGraph (whereToTryVertex.getNumber() - 1);
 
                 return true;
             } else {
